@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
 
@@ -24,6 +25,15 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         //
     ];
+
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        
+
+        //return redirect()->guest('login');
+    }
 
     /**
      * A list of the inputs that are never flashed to the session on validation exceptions.
