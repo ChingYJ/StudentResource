@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 // Passport::routes();
+
+Route::get('/students/search','StudentController@Search');
 Route::apiResource('/students', 'StudentController');
 Route::post('/register','AuthController@register');
 Route::post('/login','AuthController@login');

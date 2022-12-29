@@ -15,11 +15,43 @@ class StudentController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
+        $perPage = $request->input('per_page', 10);
         $students = new Student;
-        $students = Student::all();
-        return response()->json(['students'=>$students]);
+        $students = Student::paginate($perPage);
+        $studentsResource = ResourcesStudent::collection($students);
+        return response()->json(['students' => $studentsResource,'results'=>[
+            "students" => count($students),
+            "per_page" => $perPage
+        ]]);
+    }
+
+    public function Search(Request $request)
+    {
+        $name = $request->input('name');
+        $email = $request->input('email');
+        error_log($name);
+        $students = new Student;
+        if (!empty($name)) {
+            $students = Student::where('name', 'like', '%' . $name . '%')->get();
+        }
+
+        if (!empty($email)) {
+            $students = Student::Where('email', 'like', '%' . $email . '%')->get();
+        }
+
+        if(!empty($name) && !empty($email)){
+            $students = Student::where('name', 'like', '%' . $name . '%')->Where('email', 'like', '%' . $email . '%')->get();
+        }
+
+        if (count($students) != 0) {
+            $studentsResource = ResourcesStudent::collection($students);
+            return response()->json(['students' => $studentsResource]);
+        }else{
+            return response()->json(['msg'=>'Nothings Found']);
+        }
+
     }
 
     /**
@@ -42,8 +74,9 @@ class StudentController extends Controller
     public function show($id)
     {
         $students = new Student;
-        $students = Student::where('id',$id)->get();
-        return response()->json(['students'=>$students]);
+        $students = Student::where('id', $id)->get();
+        $studentsResource = ResourcesStudent::collection($students);
+        return response()->json(['students' => $studentsResource]);
     }
 
     /**
