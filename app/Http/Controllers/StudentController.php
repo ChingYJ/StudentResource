@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\StudentExport;
 use App\Http\Resources\Student as ResourcesStudent;
+use App\Imports\StudentImport;
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use DB;
 
@@ -21,7 +24,7 @@ class StudentController extends Controller
         $students = new Student;
         $students = Student::paginate($perPage);
         $studentsResource = ResourcesStudent::collection($students);
-        return response()->json(['students' => $studentsResource,'results'=>[
+        return response()->json(['students' => $studentsResource, 'results' => [
             "students" => count($students),
             "per_page" => $perPage
         ]]);
@@ -31,27 +34,31 @@ class StudentController extends Controller
     {
         $name = $request->input('name');
         $email = $request->input('email');
-        error_log($name);
         $students = new Student;
         if (!empty($name)) {
-            $students = Student::where('name', 'like', '%' . $name . '%')->get();
+            if (!empty($email)) {
+                $students = Student::where('name', 'like', '%' . $name . '%')->Where('email', 'like', '%' . $email . '%')->get();
+            }else{
+                $students = Student::where('name', 'like', '%' . $name . '%')->get();
+            }
+        }else{
+            if (!empty($email)) {
+                $students = Student::Where('email', 'like', '%' . $email . '%')->get();
+            }
         }
 
-        if (!empty($email)) {
-            $students = Student::Where('email', 'like', '%' . $email . '%')->get();
-        }
 
-        if(!empty($name) && !empty($email)){
-            $students = Student::where('name', 'like', '%' . $name . '%')->Where('email', 'like', '%' . $email . '%')->get();
+
+        if (empty($name) && empty($email)) {
+            $students = Student::all();
         }
 
         if (count($students) != 0) {
             $studentsResource = ResourcesStudent::collection($students);
             return response()->json(['students' => $studentsResource]);
-        }else{
-            return response()->json(['msg'=>'Nothings Found']);
+        } else {
+            return response()->json(['msg' => 'Nothings Found']);
         }
-
     }
 
     /**
@@ -100,5 +107,25 @@ class StudentController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function importFile(Request $request)
+    {
+        $validateData = $request->validate([
+            'file' => 'required|mimes:xlsx, csv, xls'
+        ]);
+
+        $import = new StudentImport;
+        $import->import($request->file('file'));
+        error_log($import->errors());
+
+        return response()->json([
+            'message' => 'Students imported successfully',
+        ]);
+    }
+
+    public function exportFile(Request $request)
+    {
+        return Excel::download(new StudentExport, 'Student.xlsx');
     }
 }

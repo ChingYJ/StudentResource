@@ -19,12 +19,16 @@ use Illuminate\Support\Facades\Route;
 // });
 // Passport::routes();
 
-Route::get('/students/search','StudentController@Search');
-Route::apiResource('/students', 'StudentController');
-Route::post('/register','AuthController@register');
-Route::post('/login','AuthController@login');
 
-Route::group(['middleware' => 'auth:api'], function (){
-    Route::get('/logout','AuthController@logout');
-    Route::get('/user','AuthController@user');
+Route::post('/login', 'AuthController@login');
+
+Route::group(['middleware' => 'auth:api'], function () {
+    Route::get('/logout', 'AuthController@logout');
+    Route::get('/user', 'AuthController@user');
+    Route::post('/register', 'AuthController@register');
+    Route::get('/students/search', 'StudentController@Search');
+    Route::post('/students/importFile', 'StudentController@importFile');
+    Route::get('/students/exportFile', 'StudentController@exportFile');
+    Route::apiResource('/students', 'StudentController');
+    Route::post('/register', 'AuthController@register');
 });
