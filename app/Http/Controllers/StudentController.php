@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use PHPUnit\Framework\MockObject\Builder\Stub;
 
 class StudentController extends Controller
 {
@@ -32,24 +33,11 @@ class StudentController extends Controller
 
     public function Search(Request $request)
     {
-        $name = $request->input('name');
-        $email = $request->input('email');
+        $search = $request->input('search');
         $students = new Student;
-        if (!empty($name)) {
-            if (!empty($email)) {
-                $students = Student::where('name', 'like', '%' . $name . '%')->Where('email', 'like', '%' . $email . '%')->get();
-            }else{
-                $students = Student::where('name', 'like', '%' . $name . '%')->get();
-            }
+        if (!empty($search)) {
+                $students = Student::where('name', 'like', '%' . $search . '%')->orWhere('email', 'like', '%' . $search . '%')->get();
         }else{
-            if (!empty($email)) {
-                $students = Student::Where('email', 'like', '%' . $email . '%')->get();
-            }
-        }
-
-
-
-        if (empty($name) && empty($email)) {
             $students = Student::all();
         }
 
