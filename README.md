@@ -9,8 +9,10 @@
     <a href="https://drive.google.com/file/d/1zEczNgVh-o_X7Df2wsfd24Fqk9-Vv5SU/view">
     https://drive.google.com/file/d/1zEczNgVh-o_X7Df2wsfd24Fqk9-Vv5SU/view</a>
 </div>
-
+<br>
+<hr>
 <div>
+    <h6>Admin account (will auto generate)</h6>
     <p>
         email: admin@gmail.com <br>
         password: 12345678
